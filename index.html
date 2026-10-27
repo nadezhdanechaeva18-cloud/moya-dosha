@@ -159,7 +159,7 @@
       <span>доступ навсегда · обновления бесплатно</span>
     </div>
     <button class="btn gold" onclick="buy()">Забрать методичку</button>
-    <p class="lock">🔒 Оплата откроется прямо здесь. Можно в рассрочку.</p>
+    <p class="lock">🔒 После оплаты методичка придёт на почту в течение 15 минут.</p>
     <div class="navrow"><button class="btn ghost" onclick="restart()">Пройти тест заново</button></div>
   </section>
 
@@ -317,7 +317,7 @@ function toProduct(){
   $('p-demo').textContent=R.demo;
   show('s-prod');
 }
-function buy(){alert("Здесь откроется оплата (GetCourse). В прототипе — заглушка.");}
+function buy(){openExt("https://familyayurveda.ru/zdorovyye_doshi");}
 function restart(){show('s-start');}
 try{if(window.Telegram&&Telegram.WebApp){Telegram.WebApp.ready();Telegram.WebApp.expand();}}catch(e){}
 </script>
