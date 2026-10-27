@@ -63,6 +63,7 @@
   .res-cap{font-size:13px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
   .res-dosha{font-size:34px;color:var(--green);font-weight:700;margin:0 0 4px}
   .res-tag{display:inline-block;padding:4px 12px;border-radius:20px;color:#fff;font-size:13px;margin-bottom:16px}
+  .res-note{font-size:13px;color:var(--muted);margin:0 0 12px;font-style:italic}
   .res-text{font-size:16px;margin:0 0 18px}
   .infl{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px 18px;margin-bottom:16px}
   .infl h3{margin:0 0 10px;font-size:14px;letter-spacing:1px;text-transform:uppercase;color:var(--gold)}
@@ -99,9 +100,9 @@
   <section class="screen active" id="s-start">
     <div class="hero">
       <div class="leaf">🌿</div>
-      <div class="badge">Аюрведа · коррекция</div>
+      <div class="badge">Экспресс-тест состояния</div>
       <h1 class="serif">Что с вами<br>происходит сейчас?</h1>
-      <p class="lead">Пройдите короткий тест — узнаете, какая доша сейчас в избытке и что с ней делать. А дальше заберёте методичку под ваше состояние.</p>
+      <p class="lead">Усталость, тяжесть, бессонница, вес, нервы, пищеварение? За 2 минуты узнаете, что у вас разбалансировано — и с чего начать восстановление. Просто и по делу.</p>
       <button class="btn" onclick="start()">Пройти тест · 2 минуты</button>
       <p class="note">14 вопросов · бесплатно</p>
     </div>
@@ -127,13 +128,15 @@
     <div class="res-cap">Ваш результат</div>
     <div class="res-dosha serif" id="r-name">—</div>
     <span class="res-tag" id="r-tag">в избытке</span>
+    <p class="res-note" id="r-note"></p>
     <p class="res-text" id="r-text"></p>
     <div class="scores" id="r-scores"></div>
     <div class="infl">
-      <h3>На что это влияет</h3>
+      <h3 id="r-infl-h">На что это влияет</h3>
       <ul id="r-infl"></ul>
     </div>
-    <button class="btn" onclick="toProduct()">Что с этим делать →</button>
+    <button class="btn" id="btn-product" onclick="toProduct()">Что с этим делать →</button>
+    <button class="btn gold" id="btn-consult" style="display:none" onclick="consult()">Записаться на разбор</button>
   </section>
 
   <!-- ЭКРАН 4: ПРОДУКТ -->
@@ -268,21 +271,43 @@ function pick(d){answers[idx]=d;next();}
 function skip(){answers[idx]=null;next();}
 function next(){if(idx<DATA.questions.length-1){idx++;render();}else{finish();}}
 function back(){if(idx>0){idx--;render();}}
+const MIX_THRESHOLD=3; // разница в баллах: >=3 — ведущая доша (методичка), меньше — смешанный тип (разбор)
 function finish(){
   const c={vata:0,pitta:0,kapha:0};
   answers.forEach(a=>{if(a)c[a]++;});
-  const top=Object.keys(c).sort((x,y)=>c[y]-c[x])[0];
-  window._top=top;
-  const R=DATA.result[top];
-  $('r-name').textContent=R.name;
-  $('r-tag').textContent="сейчас в избытке";
-  $('r-tag').style.background=R.color;
-  $('r-text').textContent=R.text;
-  $('r-infl').innerHTML=R.infl.map(x=>"<li>"+x+"</li>").join("");
+  const ord=Object.keys(c).sort((x,y)=>c[y]-c[x]);
+  const top=ord[0], second=ord[1];
+  const diff=c[top]-c[second];
+  const mixed=(c[second]>0 && diff<MIX_THRESHOLD);
+  window._top=top; window._mixed=mixed;
   $('r-scores').innerHTML=["vata","pitta","kapha"].map(k=>
     "<div class='sc'><b>"+c[k]+"</b><span>"+DATA.result[k].name+"</span></div>").join("");
+  if(mixed){
+    const A=DATA.result[top], B=DATA.result[second];
+    $('r-name').textContent=A.name+"–"+B.name;
+    $('r-tag').textContent="смешанный тип";
+    $('r-tag').style.background=A.color;
+    $('r-note').textContent="Доша — это ваш тип дисбаланса по аюрведе.";
+    $('r-text').textContent="У вас почти поровну выражены сразу две — "+A.name+" и "+B.name+". Это смешанный тип, и общая методичка здесь не подойдёт: важно не усилить одну дошу, выправляя другую. Нужен личный разбор под вашу картину.";
+    $('r-infl-h').textContent="Что лучше сделать";
+    $('r-infl').innerHTML=["Разобрать именно ваше сочетание дош","Подобрать питание и поддержку без перекосов","Составить план под ваше состояние"].map(x=>"<li>"+x+"</li>").join("");
+    $('btn-product').style.display="none";
+    $('btn-consult').style.display="block";
+  }else{
+    const R=DATA.result[top];
+    $('r-name').textContent=R.name;
+    $('r-tag').textContent="сейчас в избытке";
+    $('r-tag').style.background=R.color;
+    $('r-note').textContent="Доша — это ваш тип дисбаланса по аюрведе.";
+    $('r-text').textContent=R.text;
+    $('r-infl-h').textContent="На что это влияет";
+    $('r-infl').innerHTML=R.infl.map(x=>"<li>"+x+"</li>").join("");
+    $('btn-product').style.display="block";
+    $('btn-consult').style.display="none";
+  }
   show('s-res');
 }
+function consult(){alert("Здесь откроется запись на разбор/консультацию. В прототипе — заглушка.");}
 function toProduct(){
   const R=DATA.result[window._top];
   $('p-title').textContent="«"+R.name+". Коррекция»";
