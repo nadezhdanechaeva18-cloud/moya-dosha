@@ -271,7 +271,7 @@ function pick(d){answers[idx]=d;next();}
 function skip(){answers[idx]=null;next();}
 function next(){if(idx<DATA.questions.length-1){idx++;render();}else{finish();}}
 function back(){if(idx>0){idx--;render();}}
-const MIX_THRESHOLD=3; // разница в баллах: >=3 — ведущая доша (методичка), меньше — смешанный тип (разбор)
+const MIX_THRESHOLD=2; // разница в баллах: >=2 — ведущая доша (методичка), меньше (0–1) — смешанный тип (разбор)
 function finish(){
   const c={vata:0,pitta:0,kapha:0};
   answers.forEach(a=>{if(a)c[a]++;});
