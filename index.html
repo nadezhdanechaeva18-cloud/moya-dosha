@@ -1,0 +1,299 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
+<title>Моя доша · Коррекция</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+  :root{
+    --green:#2f4f2f; --green-d:#223b23; --cream:#f5efe3; --cream-d:#ece3d2;
+    --ink:#2b2b26; --muted:#7a7568; --gold:#b08a3e; --line:#d9cfba;
+    --vata:#7d8aa5; --pitta:#b5603f; --kapha:#5f7a52;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:-apple-system,"Segoe UI",Roboto,sans-serif;
+    background:var(--cream); color:var(--ink);
+    min-height:100vh; line-height:1.5;
+  }
+  .wrap{max-width:480px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column}
+  .serif{font-family:Georgia,"Times New Roman",serif}
+  .screen{flex:1;display:none;flex-direction:column;padding:26px 22px 28px}
+  .screen.active{display:flex}
+
+  /* старт */
+  .hero{flex:1;display:flex;flex-direction:column;justify-content:center;text-align:center}
+  .badge{align-self:center;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:18px}
+  h1{font-size:30px;line-height:1.2;margin:0 0 14px;color:var(--green);font-weight:600}
+  .lead{font-size:16px;color:var(--muted);margin:0 auto 26px;max-width:330px}
+  .leaf{font-size:40px;margin-bottom:10px}
+  .btn{
+    display:block;width:100%;border:none;border-radius:14px;
+    background:var(--green);color:#fff;font-size:17px;font-weight:600;
+    padding:17px;cursor:pointer;transition:.15s;font-family:inherit;
+  }
+  .btn:active{background:var(--green-d);transform:translateY(1px)}
+  .btn.gold{background:var(--gold)}
+  .btn.ghost{background:transparent;color:var(--green);border:1.5px solid var(--line)}
+  .note{font-size:13px;color:var(--muted);text-align:center;margin-top:14px}
+
+  /* тест */
+  .top{display:flex;align-items:center;gap:12px;margin-bottom:22px}
+  .bar{flex:1;height:6px;background:var(--cream-d);border-radius:3px;overflow:hidden}
+  .bar > i{display:block;height:100%;background:var(--gold);width:0;transition:.3s}
+  .step{font-size:13px;color:var(--muted);white-space:nowrap}
+  .q{font-size:22px;color:var(--green);margin:0 0 20px;font-weight:600}
+  .opts{display:flex;flex-direction:column;gap:12px}
+  .opt{
+    border:1.5px solid var(--line);border-radius:14px;background:#fff;
+    padding:15px 16px;font-size:15px;cursor:pointer;transition:.12s;text-align:left;
+  }
+  .opt:active{transform:scale(.99)}
+  .opt.sel{border-color:var(--green);background:#fff;box-shadow:0 0 0 3px rgba(47,79,47,.12)}
+  .skip{margin-top:16px;text-align:center}
+  .skip a{color:var(--muted);font-size:14px;text-decoration:underline;cursor:pointer}
+  .navrow{display:flex;gap:12px;margin-top:22px}
+  .navrow .btn{flex:1}
+  .hint{font-size:13px;color:var(--muted);margin:14px 2px 0}
+
+  /* результат */
+  .res-cap{font-size:13px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+  .res-dosha{font-size:34px;color:var(--green);font-weight:700;margin:0 0 4px}
+  .res-tag{display:inline-block;padding:4px 12px;border-radius:20px;color:#fff;font-size:13px;margin-bottom:16px}
+  .res-text{font-size:16px;margin:0 0 18px}
+  .infl{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px 18px;margin-bottom:16px}
+  .infl h3{margin:0 0 10px;font-size:14px;letter-spacing:1px;text-transform:uppercase;color:var(--gold)}
+  .infl ul{margin:0;padding-left:18px;color:var(--ink);font-size:15px}
+  .infl li{margin-bottom:5px}
+  .scores{display:flex;gap:8px;margin-bottom:20px}
+  .sc{flex:1;text-align:center;background:var(--cream-d);border-radius:10px;padding:8px 4px}
+  .sc b{display:block;font-size:20px;color:var(--green)}
+  .sc span{font-size:12px;color:var(--muted)}
+
+  /* продукт */
+  .prod-head{text-align:center;margin-bottom:18px}
+  .prod-head .leaf{font-size:34px}
+  .prod-title{font-size:24px;color:var(--green);font-weight:600;margin:4px 0 6px}
+  .prod-sub{font-size:15px;color:var(--muted);margin:0}
+  .card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:16px}
+  .card h3{margin:0 0 12px;font-size:15px;color:var(--green)}
+  .toc{column-count:1;margin:0;padding-left:18px;font-size:14px;color:var(--ink)}
+  .toc li{margin-bottom:6px}
+  .demo{font-size:14px;color:var(--ink);background:var(--cream-d);border-radius:12px;padding:14px 16px;margin-bottom:16px}
+  .demo .lbl{font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--gold);display:block;margin-bottom:6px}
+  .price{text-align:center;margin:6px 0 16px}
+  .price b{font-size:30px;color:var(--green)}
+  .price span{display:block;font-size:13px;color:var(--muted);margin-top:2px}
+  .lock{font-size:13px;color:var(--muted);text-align:center;margin-top:10px}
+  .proto-flag{position:fixed;top:0;left:0;right:0;background:var(--gold);color:#fff;font-size:11px;text-align:center;padding:3px;letter-spacing:1px;z-index:99}
+</style>
+</head>
+<body>
+<div class="proto-flag">ЧЕРНОВИК-ПРОТОТИП · для согласования</div>
+<div class="wrap">
+
+  <!-- ЭКРАН 1: СТАРТ -->
+  <section class="screen active" id="s-start">
+    <div class="hero">
+      <div class="leaf">🌿</div>
+      <div class="badge">Аюрведа · коррекция</div>
+      <h1 class="serif">Что с вами<br>происходит сейчас?</h1>
+      <p class="lead">Пройдите короткий тест — узнаете, какая доша сейчас в избытке и что с ней делать. А дальше заберёте методичку под ваше состояние.</p>
+      <button class="btn" onclick="start()">Пройти тест · 2 минуты</button>
+      <p class="note">14 вопросов · бесплатно</p>
+    </div>
+  </section>
+
+  <!-- ЭКРАН 2: ТЕСТ -->
+  <section class="screen" id="s-quiz">
+    <div class="top">
+      <div class="bar"><i id="bar"></i></div>
+      <div class="step" id="step">1 / 14</div>
+    </div>
+    <h2 class="q" id="q">—</h2>
+    <div class="opts" id="opts"></div>
+    <div class="skip" id="skipwrap" style="display:none"><a onclick="skip()">Пропустить — не сдавала анализы</a></div>
+    <div class="navrow">
+      <button class="btn ghost" id="backbtn" onclick="back()" style="display:none">Назад</button>
+    </div>
+    <p class="hint" id="hint"></p>
+  </section>
+
+  <!-- ЭКРАН 3: РЕЗУЛЬТАТ -->
+  <section class="screen" id="s-res">
+    <div class="res-cap">Ваш результат</div>
+    <div class="res-dosha serif" id="r-name">—</div>
+    <span class="res-tag" id="r-tag">в избытке</span>
+    <p class="res-text" id="r-text"></p>
+    <div class="scores" id="r-scores"></div>
+    <div class="infl">
+      <h3>На что это влияет</h3>
+      <ul id="r-infl"></ul>
+    </div>
+    <button class="btn" onclick="toProduct()">Что с этим делать →</button>
+  </section>
+
+  <!-- ЭКРАН 4: ПРОДУКТ -->
+  <section class="screen" id="s-prod">
+    <div class="prod-head">
+      <div class="leaf">📖</div>
+      <div class="prod-title serif" id="p-title">Методичка</div>
+      <p class="prod-sub" id="p-sub"></p>
+    </div>
+    <div class="card">
+      <h3>Что внутри — 100+ страниц</h3>
+      <ul class="toc" id="p-toc"></ul>
+    </div>
+    <div class="demo">
+      <span class="lbl">Открытый фрагмент · план действий</span>
+      <div id="p-demo"></div>
+    </div>
+    <div class="price">
+      <b>5 500 ₽</b>
+      <span>доступ навсегда · обновления бесплатно</span>
+    </div>
+    <button class="btn gold" onclick="buy()">Забрать методичку</button>
+    <p class="lock">🔒 Оплата откроется прямо здесь. Можно в рассрочку.</p>
+    <div class="navrow"><button class="btn ghost" onclick="restart()">Пройти тест заново</button></div>
+  </section>
+
+</div>
+
+<script>
+/* ===== ДАННЫЕ (для сборки вынесем в data.json) ===== */
+const DATA = {
+  price: "5 500 ₽",
+  questions: [
+    {q:"Что беспокоит сильнее всего в последнее время?", a:[
+      {d:"vata",t:"Сухость, тревога, бессонница, запоры, упадок сил"},
+      {d:"pitta",t:"Жар, раздражительность, изжога, воспаления на коже"},
+      {d:"kapha",t:"Вес, отёки, тяжесть, слизь, апатия"}]},
+    {q:"Пищеварение и живот", a:[
+      {d:"vata",t:"Вздутие, газы, урчание, запоры, спазмы"},
+      {d:"pitta",t:"Изжога, кислый/горький привкус, жжение, боли через час после еды"},
+      {d:"kapha",t:"Тяжесть и сонливость после еды, тошнота, слизь, ком в желудке"}]},
+    {q:"Стул", a:[
+      {d:"vata",t:"Сухой, твёрдый, нерегулярный, запоры"},
+      {d:"pitta",t:"Частый, жидкий, послабление, жжение"},
+      {d:"kapha",t:"Вязкий, со слизью, чувство неполного опорожнения"}]},
+    {q:"Сон", a:[
+      {d:"vata",t:"Трудно засыпаю, просыпаюсь часто, мысли крутятся"},
+      {d:"pitta",t:"Просыпаюсь в 1–3 ночи, жарко, не уснуть обратно"},
+      {d:"kapha",t:"Сплю много, но не высыпаюсь, днём клонит в сон"}]},
+    {q:"Кожа", a:[
+      {d:"vata",t:"Сухость, шелушение, трещинки, тусклость"},
+      {d:"pitta",t:"Покраснения, купероз, акне, зуд, сыпь"},
+      {d:"kapha",t:"Отёчность, одутловатость, жирность, бледность"}]},
+    {q:"Волосы", a:[
+      {d:"vata",t:"Сухие, ломкие, выпадают, пушатся"},
+      {d:"pitta",t:"Жирнятся у корней, рано седеют, редеют"},
+      {d:"kapha",t:"Тяжёлые, жирные, с перхотью, вялые"}]},
+    {q:"Нервы и настроение", a:[
+      {d:"vata",t:"Тревога, страхи, беспокойство, рассеянность"},
+      {d:"pitta",t:"Раздражительность, вспыльчивость, всё контролирую, перегораю"},
+      {d:"kapha",t:"Апатия, вялость, тоска, обиды, «заедаю»"}]},
+    {q:"Энергия", a:[
+      {d:"vata",t:"Скачет: то есть, то резко падает, быстро устаю"},
+      {d:"pitta",t:"Высокая, но перегораю, взрываюсь"},
+      {d:"kapha",t:"Низкая, вялая, тяжело раскачаться"}]},
+    {q:"Вес и отёки", a:[
+      {d:"vata",t:"Худею, трудно набрать, мёрзну"},
+      {d:"pitta",t:"Вес стабильный, но жар и воспаления"},
+      {d:"kapha",t:"Набираю легко, сбросить трудно, отёки"}]},
+    {q:"Что переношу хуже", a:[
+      {d:"vata",t:"Холод, ветер, сухость"},
+      {d:"pitta",t:"Жару, солнце, духоту"},
+      {d:"kapha",t:"Сырость, влажность, тяжесть"}]},
+    {q:"Женское здоровье и цикл", a:[
+      {d:"vata",t:"Нерегулярный, скудный, сухость, тревожный ПМС, ранний климакс"},
+      {d:"pitta",t:"Обильный, болезненный, жар и раздражительность перед циклом"},
+      {d:"kapha",t:"Отёки, застой, тяжесть, кисты, прибавка веса по циклу"}]},
+    {q:"Голова, давление, температура", a:[
+      {d:"vata",t:"Головокружения, звон в ушах, перепады, зябкость"},
+      {d:"pitta",t:"Мигрени, приливы жара, повышенное давление, 37–37,2"},
+      {d:"kapha",t:"Тяжесть в голове, заложенность, слизь в носоглотке, пониженная температура"}]},
+    {q:"Щитовидка и железо (если сдавали анализы)", analysis:true, a:[
+      {d:"vata",t:"Снижен ферритин, дефициты, АИТ (АТ-ТПО/ТГ повышены)"},
+      {d:"pitta",t:"Ферритин повышен как воспаление, повышены АЛТ/АСТ, билирубин"},
+      {d:"kapha",t:"Повышены холестерин/триглицериды, снижены АЛТ/АСТ, низкая кислотность"}]},
+    {q:"Воспаление и кровь (если сдавали анализы)", analysis:true, a:[
+      {d:"vata",t:"В норме, но много дефицитов"},
+      {d:"pitta",t:"Повышены СРБ, СОЭ, гомоцистеин"},
+      {d:"kapha",t:"Густая кровь, повышены ЛПНП, отёки"}]}
+  ],
+  result:{
+    vata:{name:"Вата", color:"#7d8aa5",
+      text:"Сейчас в избытке Вата — доша сухости, холода и движения. Отсюда сухость и тревога, беспокойный сон, запоры и упадок сил: всё разгоняется и теряет опору.",
+      infl:["Кожа, волосы, суставы","Пищеварение и усвоение","Нервы, сон, тревожность","Цикл и ранний климакс"],
+      demo:"С Ватой работаем мягко и по шагам: 1) снижаем стресс — без этого Вату не унять; 2) возвращаем в еду тепло, регулярность и правильные сочетания; 3) укрепляем пищеварительный огонь; 4) восстанавливаем слизистую ЖКТ и усвоение; 5) восполняем дефициты и наращиваем опору."},
+    pitta:{name:"Питта", color:"#b5603f",
+      text:"Сейчас в избытке Питта — доша жара и кислоты. Отсюда раздражительность и вспышки, изжога, воспаления и реактивная кожа: внутри слишком много огня.",
+      infl:["Кожа: купероз, акне, сыпь","Печень, желчный, поджелудочная","ЖКТ: изжога, жжение","Давление, эмоции, сон"],
+      demo:"С Питтой задача — убрать лишний жар: 1) находим источник воспаления; 2) выстраиваем питание по доше — меньше острого, кислого, жареного; 3) стабилизируем пищеварительный огонь; 4) мягко выводим избыток жара; 5) поддерживаем печень."},
+    kapha:{name:"Капха", color:"#5f7a52",
+      text:"Сейчас в избытке Капха — доша тяжести, холода и влаги. Отсюда лишний вес и отёки, тяжесть после еды, слизь и апатия: всё замедляется и застаивается.",
+      infl:["Вес и обмен веществ","Лимфа и отёки","Пищеварение: тяжесть, слизь","Настроение, энергия, мотивация"],
+      demo:"Капха долго раскачивается, поэтому главное — движение: 1) добавляем физическую активность; 2) разгоняем лимфу; 3) усиливаем пищеварительный огонь и обмен; 4) работаем с весом и щитовидкой; 5) облегчаем и подсушиваем питание — меньше тяжёлого, молочного и сладкого."}
+  },
+  toc:["Функции доши и места локализации","Качества и подтипы","Признаки проблем и возможные диагнозы","План действий по шагам","Питание: рацион, рецепты, специи, напитки, меню","Образ жизни и практики (пранаяма, йога, массаж, баня)","Коррекция по системам: нервная, ЖКТ, лимфа, печень","Схемы при АИТ, гипотиреозе, гепатозе","Женское здоровье и менопауза"]
+};
+
+/* ===== ЛОГИКА ===== */
+let idx=0, answers=[], order=[];
+const $=id=>document.getElementById(id);
+function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));$(id).classList.add('active');window.scrollTo(0,0);}
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){let j=Math.floor((i+1)*((i*7+3)%11)/11);[a[i],a[j]]=[a[j],a[i]];}return a;}
+function start(){idx=0;answers=[];render();show('s-quiz');}
+function render(){
+  const Q=DATA.questions[idx];
+  $('q').textContent=Q.q;
+  $('step').textContent=(idx+1)+" / "+DATA.questions.length;
+  $('bar').style.width=((idx)/DATA.questions.length*100)+"%";
+  order=shuffle(Q.a.map((_,i)=>i));
+  const box=$('opts');box.innerHTML="";
+  order.forEach(oi=>{
+    const o=Q.a[oi];const d=document.createElement('button');
+    d.className="opt"+(answers[idx]===o.d?" sel":"");
+    d.textContent=o.t;d.onclick=()=>pick(o.d);
+    box.appendChild(d);
+  });
+  $('skipwrap').style.display=Q.analysis?"block":"none";
+  $('backbtn').style.display=idx>0?"block":"none";
+  $('hint').textContent=Q.analysis?"Этот блок — по желанию. Нет анализов — просто пропустите.":"";
+}
+function pick(d){answers[idx]=d;next();}
+function skip(){answers[idx]=null;next();}
+function next(){if(idx<DATA.questions.length-1){idx++;render();}else{finish();}}
+function back(){if(idx>0){idx--;render();}}
+function finish(){
+  const c={vata:0,pitta:0,kapha:0};
+  answers.forEach(a=>{if(a)c[a]++;});
+  const top=Object.keys(c).sort((x,y)=>c[y]-c[x])[0];
+  window._top=top;
+  const R=DATA.result[top];
+  $('r-name').textContent=R.name;
+  $('r-tag').textContent="сейчас в избытке";
+  $('r-tag').style.background=R.color;
+  $('r-text').textContent=R.text;
+  $('r-infl').innerHTML=R.infl.map(x=>"<li>"+x+"</li>").join("");
+  $('r-scores').innerHTML=["vata","pitta","kapha"].map(k=>
+    "<div class='sc'><b>"+c[k]+"</b><span>"+DATA.result[k].name+"</span></div>").join("");
+  show('s-res');
+}
+function toProduct(){
+  const R=DATA.result[window._top];
+  $('p-title').textContent="«"+R.name+". Коррекция»";
+  $('p-sub').textContent="Пошаговая методичка под ваше состояние";
+  $('p-toc').innerHTML=DATA.toc.map(x=>"<li>"+x+"</li>").join("");
+  $('p-demo').textContent=R.demo;
+  show('s-prod');
+}
+function buy(){alert("Здесь откроется оплата (GetCourse). В прототипе — заглушка.");}
+function restart(){show('s-start');}
+try{if(window.Telegram&&Telegram.WebApp){Telegram.WebApp.ready();Telegram.WebApp.expand();}}catch(e){}
+</script>
+</body>
+</html>
