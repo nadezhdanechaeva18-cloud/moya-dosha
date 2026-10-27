@@ -307,7 +307,8 @@ function finish(){
   }
   show('s-res');
 }
-function consult(){alert("Здесь откроется запись на разбор/консультацию. В прототипе — заглушка.");}
+function openExt(url){try{if(window.Telegram&&Telegram.WebApp&&Telegram.WebApp.openLink){Telegram.WebApp.openLink(url);return;}}catch(e){}window.open(url,"_blank");}
+function consult(){openExt("https://consult.familyayurveda.ru/");}
 function toProduct(){
   const R=DATA.result[window._top];
   $('p-title').textContent="«"+R.name+". Коррекция»";
