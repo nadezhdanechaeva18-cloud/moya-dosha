@@ -22,20 +22,26 @@
   .wrap{max-width:480px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column}
   .serif{font-family:Georgia,"Times New Roman",serif}
   .screen{flex:1;display:none;flex-direction:column;padding:26px 22px 28px}
-  .screen.active{display:flex}
+  .screen.active{display:flex;animation:fadeUp .4s ease both}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+  @keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.07)}}
+  @keyframes pop{from{opacity:0;transform:scale(.8)}to{opacity:1;transform:scale(1)}}
 
   /* старт */
   .hero{flex:1;display:flex;flex-direction:column;justify-content:center;text-align:center}
   .badge{align-self:center;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:18px}
   h1{font-size:30px;line-height:1.2;margin:0 0 14px;color:var(--green);font-weight:600}
   .lead{font-size:16px;color:var(--muted);margin:0 auto 26px;max-width:330px}
-  .leaf{font-size:40px;margin-bottom:10px}
+  .leaf{font-size:44px;margin-bottom:10px;animation:breathe 3.5s ease-in-out infinite}
   .btn{
     display:block;width:100%;border:none;border-radius:14px;
     background:var(--green);color:#fff;font-size:17px;font-weight:600;
     padding:17px;cursor:pointer;transition:.15s;font-family:inherit;
   }
-  .btn:active{background:var(--green-d);transform:translateY(1px)}
+  .btn{box-shadow:0 4px 14px rgba(47,79,47,.18)}
+  .btn:active{background:var(--green-d);transform:translateY(1px);box-shadow:0 2px 8px rgba(47,79,47,.18)}
+  .btn.gold{box-shadow:0 4px 14px rgba(176,138,62,.25)}
+  .btn.ghost{box-shadow:none}
   .btn.gold{background:var(--gold)}
   .btn.ghost{background:transparent;color:var(--green);border:1.5px solid var(--line)}
   .note{font-size:13px;color:var(--muted);text-align:center;margin-top:14px}
@@ -51,6 +57,7 @@
     border:1.5px solid var(--line);border-radius:14px;background:#fff;
     padding:15px 16px;font-size:15px;cursor:pointer;transition:.12s;text-align:left;
   }
+  .opt{animation:fadeUp .35s ease both}
   .opt:active{transform:scale(.99)}
   .opt.sel{border-color:var(--green);background:#fff;box-shadow:0 0 0 3px rgba(47,79,47,.12)}
   .skip{margin-top:16px;text-align:center}
@@ -60,6 +67,7 @@
   .hint{font-size:13px;color:var(--muted);margin:14px 2px 0}
 
   /* результат */
+  .res-icon{width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:32px;margin-bottom:14px;animation:pop .45s ease both;box-shadow:0 4px 14px rgba(0,0,0,.08)}
   .res-cap{font-size:13px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
   .res-dosha{font-size:34px;color:var(--green);font-weight:700;margin:0 0 4px}
   .res-tag{display:inline-block;padding:4px 12px;border-radius:20px;color:#fff;font-size:13px;margin-bottom:16px}
@@ -125,6 +133,7 @@
 
   <!-- ЭКРАН 3: РЕЗУЛЬТАТ -->
   <section class="screen" id="s-res">
+    <div class="res-icon" id="r-icon">🌿</div>
     <div class="res-cap">Ваш результат</div>
     <div class="res-dosha serif" id="r-name">—</div>
     <span class="res-tag" id="r-tag">в избытке</span>
@@ -228,15 +237,15 @@ const DATA = {
       {d:"kapha",t:"Густая кровь, повышены ЛПНП, отёки"}]}
   ],
   result:{
-    vata:{name:"Вата", color:"#7d8aa5",
+    vata:{name:"Вата", color:"#7d8aa5", icon:"💨",
       text:"Сейчас в избытке Вата — доша сухости, холода и движения. Отсюда сухость и тревога, беспокойный сон, запоры и упадок сил: всё разгоняется и теряет опору.",
       infl:["Кожа, волосы, суставы","Пищеварение и усвоение","Нервы, сон, тревожность","Цикл и ранний климакс"],
       demo:"С Ватой работаем мягко и по шагам: 1) снижаем стресс — без этого Вату не унять; 2) возвращаем в еду тепло, регулярность и правильные сочетания; 3) укрепляем пищеварительный огонь; 4) восстанавливаем слизистую ЖКТ и усвоение; 5) восполняем дефициты и наращиваем опору."},
-    pitta:{name:"Питта", color:"#b5603f",
+    pitta:{name:"Питта", color:"#b5603f", icon:"🔥",
       text:"Сейчас в избытке Питта — доша жара и кислоты. Отсюда раздражительность и вспышки, изжога, воспаления и реактивная кожа: внутри слишком много огня.",
       infl:["Кожа: купероз, акне, сыпь","Печень, желчный, поджелудочная","ЖКТ: изжога, жжение","Давление, эмоции, сон"],
       demo:"С Питтой задача — убрать лишний жар: 1) находим источник воспаления; 2) выстраиваем питание по доше — меньше острого, кислого, жареного; 3) стабилизируем пищеварительный огонь; 4) мягко выводим избыток жара; 5) поддерживаем печень."},
-    kapha:{name:"Капха", color:"#5f7a52",
+    kapha:{name:"Капха", color:"#5f7a52", icon:"💧",
       text:"Сейчас в избытке Капха — доша тяжести, холода и влаги. Отсюда лишний вес и отёки, тяжесть после еды, слизь и апатия: всё замедляется и застаивается.",
       infl:["Вес и обмен веществ","Лимфа и отёки","Пищеварение: тяжесть, слизь","Настроение, энергия, мотивация"],
       demo:"Капха долго раскачивается, поэтому главное — движение: 1) добавляем физическую активность; 2) разгоняем лимфу; 3) усиливаем пищеварительный огонь и обмен; 4) работаем с весом и щитовидкой; 5) облегчаем и подсушиваем питание — меньше тяжёлого, молочного и сладкого."}
@@ -257,9 +266,10 @@ function render(){
   $('bar').style.width=((idx)/DATA.questions.length*100)+"%";
   order=shuffle(Q.a.map((_,i)=>i));
   const box=$('opts');box.innerHTML="";
-  order.forEach(oi=>{
+  order.forEach((oi,n)=>{
     const o=Q.a[oi];const d=document.createElement('button');
     d.className="opt"+(answers[idx]===o.d?" sel":"");
+    d.style.animationDelay=(n*0.06)+"s";
     d.textContent=o.t;d.onclick=()=>pick(o.d);
     box.appendChild(d);
   });
@@ -284,6 +294,8 @@ function finish(){
     "<div class='sc'><b>"+c[k]+"</b><span>"+DATA.result[k].name+"</span></div>").join("");
   if(mixed){
     const A=DATA.result[top], B=DATA.result[second];
+    $('r-icon').textContent=A.icon+B.icon;
+    $('r-icon').style.background="linear-gradient(135deg,"+A.color+"33,"+B.color+"33)";
     $('r-name').textContent=A.name+"–"+B.name;
     $('r-tag').textContent="смешанный тип";
     $('r-tag').style.background=A.color;
@@ -295,6 +307,8 @@ function finish(){
     $('btn-consult').style.display="block";
   }else{
     const R=DATA.result[top];
+    $('r-icon').textContent=R.icon;
+    $('r-icon').style.background=R.color+"22";
     $('r-name').textContent=R.name;
     $('r-tag').textContent="сейчас в избытке";
     $('r-tag').style.background=R.color;
